@@ -38,6 +38,7 @@ module gcd (
 
     logic ABorALU, LDA, LDB, N, Z;
     logic [1 : 0] FN;
+    logic [15 : 0] Y, C_int;
     
     // Combinatorial logic
     always_comb begin
@@ -117,6 +118,46 @@ module gcd (
                 end
             end
         endcase
+
+        // DataPath
+        case (FN)
+            2'b00: Y = reg_a - reg_b;
+            2'b01: Y = reg_b - reg_a;
+            2'b10: Y = reg_a;
+            2'b11: Y = reg_b;
+        endcase
+
+        if (Y == 16'b0) begin
+            Z = 1'b1;
+        end
+        else begin
+            Z = 1'b0;
+        end
+
+        N = Y[15];
+
+        if (ABorALU) begin
+            C_int = AB;
+        end
+        else begin
+            C_int = Y;
+        end
+
+        if (LDA) begin
+            next_reg_a = C_int;
+        end
+        else begin
+            next_reg_a = reg_a;
+        end
+
+        if (LDb) begin
+            next_reg_b = C_int;
+        end
+        else begin
+            next_reg_b = reg_b;
+        end
+
+        C = C_int;
     end
 
     // Register
