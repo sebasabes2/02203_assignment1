@@ -60,7 +60,7 @@ module gcd (
             LOADA: begin
                 ABorALU = 1'b1;
                 LDA = 1'b1;
-                next_state = ACKA
+                next_state = ACKA;
             end
             ACKA: begin 
                 ack = 1'b1;
@@ -150,7 +150,7 @@ module gcd (
             next_reg_a = reg_a;
         end
 
-        if (LDb) begin
+        if (LDB) begin
             next_reg_b = C_int;
         end
         else begin
@@ -162,14 +162,16 @@ module gcd (
 
     // Register
     always_ff @(posedge clk or posedge reset) begin
-        if (reset)
+        if (reset) begin
             state <= IDLE;
             reg_a <= 16'b0;
             reg_b <= 16'b0;
-        else
+        end
+        else begin
             state <= next_state;
             reg_a <= next_reg_a;
             reg_b <= next_reg_b;
+        end
     end
 
 endmodule
