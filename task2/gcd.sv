@@ -27,7 +27,6 @@ module gcd (
         WAITB,
         LOADB,
         LOOP,
-        ABDIFF,
         AGREATEST,
         BGREATEST,
         ACKB
@@ -36,11 +35,87 @@ module gcd (
     shortint unsigned reg_a, next_reg_a, reg_b, next_reg_b;
     
     state_t state, next_state;
+
+    logic ABorALU, LDA, LDB, N, Z;
+    logic [1 : 0] FN;
     
     // Combinatorial logic
     always_comb begin
+        ABorALU = 1'b0;
+        LDA = 1'b0;
+        LDB = 1'b0;
+        FN = 2'b00;
+        ack = 1'b0; 
+
         case (state)
-            // <COMBINATORIAL BODY> 
+            IDLE: begin
+                if (req) begin
+                    next_state = LOADA;
+                end
+                else begin
+                    next_state = IDLE;
+                end
+            end
+            LOADA: begin
+                ABorALU = 1'b1;
+                LDA = 1'b1;
+                next_state = ACKA
+            end
+            ACKA: begin 
+                ack = 1'b1;
+                if (req) begin
+                    next_state = ACKA;
+                end
+                else begin 
+                    next_state = WAITB;
+                end
+            end
+            WAITB: begin 
+                if (req) begin
+                    next_state = LOADB;
+                end
+                else begin 
+                    next_state = WAITB;
+                end
+            end
+            LOADB: begin
+                ABorALU = 1'b1;
+                LDB = 1'b1;
+                next_state = LOOP;
+            end
+            LOOP: begin
+                if (Z) begin
+                    next_state = ACKB;
+                end
+                else begin
+                    if (N) begin
+                        next_state = BGREATEST;
+                    end
+                    else begin
+                        next_state = AGREATEST;
+                    end
+                end
+            end
+            AGREATEST: begin
+                FN = 2'b00;
+                LDA = 1'b1;
+                next_state = LOOP;
+            end
+            BGREATEST: begin
+                FN = 2'b01; 
+                LDB = 1'b1;
+                next_state = LOOP;
+            end
+            ACKB: begin
+                FN = 2'b10;
+                ack = 1'b1;
+                if (req) begin
+                    next_state = ACKB;
+                end
+                else begin
+                    next_state = IDLE;
+                end
+            end
         endcase
     end
 
