@@ -20,7 +20,18 @@ module gcd (
     output logic          ack,    // Input received / Computation is complete.
     output logic [15 : 0] C       // The result.
 );
-    typedef enum logic [1 : 0] { ... } state_t; // Input your own state names here
+    typedef enum logic [1 : 0] {
+        IDLE,
+        LOADA,
+        ACKA,
+        WAITB,
+        LOADB,
+        LOOP,
+        ABDIFF,
+        AGREATEST,
+        BGREATEST,
+        ACKB
+    } state_t;
 
     shortint unsigned reg_a, next_reg_a, reg_b, next_reg_b;
     
