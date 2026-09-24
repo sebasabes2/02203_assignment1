@@ -44,7 +44,7 @@ module gcd (
         endcase
     end
 
-        // Register
+    // Register
     always_ff @(posedge clk or posedge reset) begin
         if (reset)
             state <= IDLE;
