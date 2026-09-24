@@ -20,7 +20,7 @@ module gcd (
     output logic          ack,    // Input received / Computation is complete.
     output logic [15 : 0] C       // The result.
 );
-    typedef enum logic [1 : 0] {
+    typedef enum logic [3 : 0] {
         IDLE,
         LOADA,
         ACKA,
