@@ -46,7 +46,14 @@ module gcd (
 
         // Register
     always_ff @(posedge clk or posedge reset) begin
-        // <REGISTER BODY>
+        if (reset)
+            state <= IDLE;
+            reg_a <= 16'b0;
+            reg_b <= 16'b0;
+        else
+            state <= next_state;
+            reg_a <= next_reg_a;
+            reg_b <= next_reg_b;
     end
 
 endmodule
