@@ -131,15 +131,15 @@ module gcd (
                 if (req) begin
                     next_state = ACKA;
                 end
-                else begin 
+                else begin
                     next_state = WAITB;
                 end
             end
-            WAITB: begin 
+            WAITB: begin
                 if (req) begin
                     next_state = LOADB;
                 end
-                else begin 
+                else begin
                     next_state = WAITB;
                 end
             end
