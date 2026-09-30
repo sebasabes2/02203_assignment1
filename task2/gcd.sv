@@ -42,82 +42,38 @@ module gcd (
     
     // Combinatorial logic
     always_comb begin
-        ABorALU = 1'b0;
-        LDA = 1'b0;
-        LDB = 1'b0;
-        FN = 2'b00;
-        ack = 1'b0; 
-
+        // Moore outputs of FSM
         case (state)
-            IDLE: begin
-                if (req) begin
-                    next_state = LOADA;
-                end
-                else begin
-                    next_state = IDLE;
-                end
-            end
             LOADA: begin
                 ABorALU = 1'b1;
                 LDA = 1'b1;
-                next_state = ACKA;
             end
             ACKA: begin 
                 ack = 1'b1;
-                if (req) begin
-                    next_state = ACKA;
-                end
-                else begin 
-                    next_state = WAITB;
-                end
-            end
-            WAITB: begin 
-                if (req) begin
-                    next_state = LOADB;
-                end
-                else begin 
-                    next_state = WAITB;
-                end
             end
             LOADB: begin
                 ABorALU = 1'b1;
                 LDB = 1'b1;
-                next_state = LOOP;
-            end
-            LOOP: begin
-                if (Z) begin
-                    next_state = ACKB;
-                end
-                else begin
-                    if (N) begin
-                        next_state = BGREATEST;
-                    end
-                    else begin
-                        next_state = AGREATEST;
-                    end
-                end
             end
             AGREATEST: begin
                 FN = 2'b00;
                 LDA = 1'b1;
-                next_state = LOOP;
             end
             BGREATEST: begin
                 FN = 2'b01; 
                 LDB = 1'b1;
-                next_state = LOOP;
             end
             ACKB: begin
                 FN = 2'b10;
                 ack = 1'b1;
-                if (req) begin
-                    next_state = ACKB;
-                end
-                else begin
-                    next_state = IDLE;
-                end
             end
-            default: next_state = IDLE;
+            default: begin
+                ABorALU = 1'b0;
+                LDA = 1'b0;
+                LDB = 1'b0;
+                FN = 2'b00;
+                ack = 1'b0;
+            end
         endcase
 
         // DataPath
@@ -158,6 +114,69 @@ module gcd (
             next_reg_b = reg_b;
         end
 
+        // Next state of FSM
+        case (state)
+            IDLE: begin
+                if (req) begin
+                    next_state = LOADA;
+                end
+                else begin
+                    next_state = IDLE;
+                end
+            end
+            LOADA: begin
+                next_state = ACKA;
+            end
+            ACKA: begin
+                if (req) begin
+                    next_state = ACKA;
+                end
+                else begin 
+                    next_state = WAITB;
+                end
+            end
+            WAITB: begin 
+                if (req) begin
+                    next_state = LOADB;
+                end
+                else begin 
+                    next_state = WAITB;
+                end
+            end
+            LOADB: begin
+                next_state = LOOP;
+            end
+            LOOP: begin
+                if (Z) begin
+                    next_state = ACKB;
+                end
+                else begin
+                    if (N) begin
+                        next_state = BGREATEST;
+                    end
+                    else begin
+                        next_state = AGREATEST;
+                    end
+                end
+            end
+            AGREATEST: begin
+                next_state = LOOP;
+            end
+            BGREATEST: begin
+                next_state = LOOP;
+            end
+            ACKB: begin
+                if (req) begin
+                    next_state = ACKB;
+                end
+                else begin
+                    next_state = IDLE;
+                end
+            end
+            default: next_state = IDLE;
+        endcase
+
+        // Output
         C = C_int;
     end
 
