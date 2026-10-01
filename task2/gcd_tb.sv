@@ -42,12 +42,12 @@ module gcd_tb ();
   end
 
   // Provide test input to the entity in the testbench
-  localparam N_OPS = 5;
+  localparam N_OPS = 6;
 
   // Change numbers here if you what to run different tests
-  shortint unsigned a_ops[N_OPS - 1 : 0] = '{91, 32768, 49, 29232, 25};
-  shortint unsigned b_ops[N_OPS - 1 : 0] = '{63, 272, 98, 488, 5};
-  shortint unsigned c_ops[N_OPS - 1 : 0] = '{7, 16, 49, 8, 5};
+  shortint unsigned a_ops[N_OPS - 1 : 0] = '{91, 32768, 49, 29232, 9, 25};
+  shortint unsigned b_ops[N_OPS - 1 : 0] = '{63, 272, 98, 488, 5, 5};
+  shortint unsigned c_ops[N_OPS - 1 : 0] = '{7, 16, 49, 8, 1, 5};
 
   initial begin
     // Reset entity for some clock cycles
@@ -93,6 +93,58 @@ module gcd_tb ();
         @(posedge clk);
       end
     end
+
+    // Stay in state IDLE for 10 clock cycles
+    req = 0;
+    for (int i = 0; i < 10; i++) begin
+      @(posedge clk);
+      assert (ack == 0)
+      else $error("assertion failed");
+    end
+
+    // Go to state ACKA
+    req = 1;
+    AB = 15;
+    while (ack != 1) begin
+      @(posedge clk);
+    end
+
+    // Stay in state ACKA for 10 clock cycles
+    for (int i = 0; i < 10; i++) begin
+      @(posedge clk);
+      assert (ack == 1)
+      else $error("assertion failed");
+    end
+
+    // Go to state WAITB
+    req = 0;
+    while (ack != 0) begin
+      @(posedge clk);
+    end
+
+    // Stay in state WAITB for 10 clock cycles
+    for (int i = 0; i < 10; i++) begin
+      @(posedge clk);
+      assert (ack == 0)
+      else $error("assertion failed");
+    end
+
+    // Go to state ACKB
+    req = 1;
+    AB = 8;
+    while (ack != 1) begin
+      @(posedge clk);
+    end
+
+    // Stay in state ACKB for 10 clock cycles
+    for (int i = 0; i < 10; i++) begin
+      @(posedge clk);
+      assert (ack == 1)
+      else $error("assertion failed");
+      assert (C == 1)
+      else $error("assertion failed");
+    end
+
     #CLOCK;
     $display("Test succeeded");
     $finish;
