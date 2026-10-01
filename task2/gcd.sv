@@ -36,7 +36,7 @@ module gcd (
     
     state_t state, next_state;
 
-    logic ABorALU, LDA, LDB, N, Z;
+    logic ABorALU, LDA, LDB, N, Z, OutputC;
     logic [1 : 0] FN;
     logic [15 : 0] Y, C_int;
     
@@ -66,6 +66,7 @@ module gcd (
             ACKB: begin
                 FN = 2'b10;
                 ack = 1'b1;
+                OutputC = 1'b1;
             end
             default: begin
                 ABorALU = 1'b0;
@@ -73,6 +74,7 @@ module gcd (
                 LDB = 1'b0;
                 FN = 2'b00;
                 ack = 1'b0;
+                OutputC = 1'b0;
             end
         endcase
 
@@ -177,7 +179,12 @@ module gcd (
         endcase
 
         // Output
-        C = C_int;
+        if (OutputC) begin
+            C = C_int;
+        end
+        else begin
+            C = 16'b0;
+        end
     end
 
     // Register
