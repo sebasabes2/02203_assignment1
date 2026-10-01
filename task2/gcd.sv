@@ -12,7 +12,7 @@
 // -----------------------------------------------------------------------------
 
 
-module gcd_operand_share (
+module gcd (
     input  logic          clk,    // The clock signal.
     input  logic          reset,  // Reset the module.
     input  logic          req,    // Start computation.
@@ -32,7 +32,7 @@ module gcd_operand_share (
         ACKB
     } state_t;
 
-    shortint unsigned reg_a, next_reg_a, reg_b, next_reg_b, Operand_1, Operand_2;
+    shortint unsigned reg_a, next_reg_a, reg_b, next_reg_b;
     
     state_t state, next_state;
 
@@ -79,16 +79,12 @@ module gcd_operand_share (
         endcase
 
         // DataPath
-        Operand_1 = 0;
-        Operand_2 = 0;
         case (FN)
-            2'b00: begin Operand_1 = reg_a; Operand_2 = reg_b; end
-            2'b01: begin Operand_1 = reg_b; Operand_2 = reg_a; end
-            2'b10: begin Operand_1 = reg_a; end
-            2'b11: begin Operand_1 = reg_b; end
+            2'b00: Y = reg_a - reg_b;
+            2'b01: Y = reg_b - reg_a;
+            2'b10: Y = reg_a;
+            2'b11: Y = reg_b;
         endcase
-
-        Y = Operand_1 - Operand_2;
 
         if (Y == 16'b0) begin
             Z = 1'b1;
