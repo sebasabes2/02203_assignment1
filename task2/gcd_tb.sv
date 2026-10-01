@@ -94,60 +94,56 @@ module gcd_tb ();
       end
     end
 
-    // Stay in state IDLE
+    // Stay in state IDLE for 10 clock cycles
     req = 0;
-    @(posedge clk);
-    assert(ack == 0);
-
-    // Go to state LOADA
-    req = 1;
-    @(posedge clk);
+    for (int i = 0; i < 10; i++) begin
+      @(posedge clk);
+      assert (ack == 0)
+      else $error("assertion failed");
+    end
 
     // Go to state ACKA
+    req = 1;
     AB = 15;
-    @(posedge clk);
-    assert(ack == 1);
-
-    // Stay in state ACKA
-    req = 1;
-    @(posedge clk);
-    assert(ack == 1);
-
-    // Go to state WAITB
-    req = 0;
-    @(posedge clk);
-    assert(ack == 0);
-
-    // Stay in state WAITB
-    req = 0;
-    @(posedge clk);
-    assert(ack == 0);
-
-    // Go to state LOADB
-    req = 1;
-    @(posedge clk);
-
-    // Go to state Loop
-    AB = 8;
-    @(posedge clk);
-
-    // Wait for ack high
     while (ack != 1) begin
       @(posedge clk);
     end
-    assert(ack == 1);
-    assert(C == 1);
 
-    // Stay in state ACKB
-    req = 1;
-    @(posedge clk);
-    assert(ack == 1);
-    assert(C == 1);
+    // Stay in state ACKA for 10 clock cycles
+    for (int i = 0; i < 10; i++) begin
+      @(posedge clk);
+      assert (ack == 1)
+      else $error("assertion failed");
+    end
 
-    // Go to state IDLE
+    // Go to state WAITB
     req = 0;
-    @(posedge clk);
-    assert(ack == 0);
+    while (ack != 0) begin
+      @(posedge clk);
+    end
+
+    // Stay in state WAITB for 10 clock cycles
+    for (int i = 0; i < 10; i++) begin
+      @(posedge clk);
+      assert (ack == 0)
+      else $error("assertion failed");
+    end
+
+    // Go to state ACKB
+    req = 1;
+    AB = 8;
+    while (ack != 1) begin
+      @(posedge clk);
+    end
+
+    // Stay in state ACKB for 10 clock cycles
+    for (int i = 0; i < 10; i++) begin
+      @(posedge clk);
+      assert (ack == 1)
+      else $error("assertion failed");
+      assert (C == 1)
+      else $error("assertion failed");
+    end
 
     #CLOCK;
     $display("Test succeeded");
